@@ -4,15 +4,19 @@
 //----------------------------------------------------------
 
 if ( ! gform ) {
+	document.addEventListener( 'gform_main_scripts_loaded', function() { gform.scriptsLoaded = true; } );
 	window.addEventListener( 'DOMContentLoaded', function() { gform.domLoaded = true; } );
 
 	var gform = {
 		domLoaded: false,
+		scriptsLoaded: false,
 		initializeOnLoaded: function( fn ) {
-			if ( gform.domLoaded ) {
+			if ( gform.domLoaded && gform.scriptsLoaded ) {
 				fn();
-			} else {
+			} else if( ! gform.domLoaded && gform.scriptsLoaded ) {
 				window.addEventListener( 'DOMContentLoaded', fn );
+			} else {
+				document.addEventListener( 'gform_main_scripts_loaded', fn );
 			}
 		},
 		hooks: { action: {}, filter: {} },
@@ -57,8 +61,10 @@ if ( ! gform ) {
 				var hooks = gform.hooks[hookType][action], hook;
 				//sort by priority
 				hooks.sort(function(a,b){return a["priority"]-b["priority"]});
-				for( var i=0; i<hooks.length; i++) {
-					hook = hooks[i].callable;
+
+				hooks.forEach( function( hookItem ) {
+					hook = hookItem.callable;
+
 					if(typeof hook != 'function')
 						hook = window[hook];
 					if ( 'action' == hookType ) {
@@ -66,7 +72,7 @@ if ( ! gform ) {
 					} else {
 						args[0] = hook.apply(null, args);
 					}
-				}
+				} );
 			}
 			if ( 'filter'==hookType ) {
 				return args[0];
@@ -75,11 +81,11 @@ if ( ! gform ) {
 		removeHook: function( hookType, action, priority, tag ) {
 			if ( undefined != gform.hooks[hookType][action] ) {
 				var hooks = gform.hooks[hookType][action];
-				for( var i=hooks.length-1; i>=0; i--) {
-					if ((undefined==tag||tag==hooks[i].tag) && (undefined==priority||priority==hooks[i].priority)){
-						hooks.splice(i,1);
-					}
-				}
+				hooks = hooks.filter( function(hook, index, arr) {
+					var removeHook = (undefined==tag||tag==hook.tag) && (undefined==priority||priority==hook.priority);
+					return !removeHook;
+				} );
+				gform.hooks[hookType][action] = hooks;
 			}
 		}
 	};
