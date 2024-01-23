@@ -7,12 +7,14 @@ namespace Gravity_Forms\Gravity_Forms\License;
  *
  * Helper class to provide license statuse codes and messages. Should not be instantiated, but used statically.
  *
+ * @since 2.5.11
+ *
  * @package Gravity_Forms\Gravity_Forms\License
  */
 class GF_License_Statuses {
 	const VALID_KEY             = 'valid_key';
 	const SITE_UNREGISTERED     = 'site_unregistered';
-	const INVALID_LICENSE_KEY   = 'gravityapi_invalid_license_key';
+	const INVALID_LICENSE_KEY   = 'gravityapi_invalid_license';
 	const EXPIRED_LICENSE_KEY   = 'gravityapi_expired_license';
 	const SITE_REVOKED          = 'gravityapi_site_revoked';
 	const URL_CHANGED           = 'gravityapi_site_url_changed';
@@ -27,18 +29,15 @@ class GF_License_Statuses {
 	/**
 	 * Get the correct Message for the given code.
 	 *
+	 * @since 2.5.11
+	 *
 	 * @param $code
 	 *
 	 * @return mixed|string|void
 	 */
 	public static function get_message_for_code( $code ) {
 
-		$general_invalid_message = sprintf(
-		/* translators: %1s and %2s are link tag markup */
-			__( 'The license key entered is incorrect; please visit the %1$sGravity Forms website%2$s to verify your license.', 'gravityforms' ),
-			'<a href="https://www.gravityforms.com/my-account/licenses/?utm_source=gf-admin&utm_medium=purchase-link&utm_campaign=license-enforcement" target="_blank">',
-			'</a>'
-		);
+		
 
 		$map = array(
 			self::VALID_KEY             => __( 'Your license key has been successfully validated.', 'gravityforms' ),
